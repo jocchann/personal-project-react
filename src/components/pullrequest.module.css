@@ -1,0 +1,11 @@
+.open {
+	color: mediumspringgreen;
+}
+
+.closed {
+	color: firebrick;
+}
+
+.merged {
+	color: rebeccapurple;
+}

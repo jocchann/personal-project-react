@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import style from './pullrequest.module.css'
 
 class PullRequestList extends Component {
 	render(props) {
@@ -13,11 +13,11 @@ class PullRequestList extends Component {
 						<div>
 							<a href={request.html_url} target="_blank" rel="noopener noreferrer">{request.title}</a>
 
-								
-							{request.state === 'opened' && <span className="pr-open">{request.state}</span>}
-							{(request.state === 'closed' && request.merged === true) && <span className="pr-merged">{request.state} - merged</span>}
+							{request.state === 'opened' && <span className={style.open}>{request.state}</span>}
 
-							{(request.state === 'closed' && request.merged === false) && <span className="pr-closed">{request.state} - not merged</span>}
+							{(request.state === 'closed' && request.merged === false) && <span className={style.closed}>{request.state} - not merged</span>}
+
+							{(request.state === 'closed' && request.merged === true) && <span className={style.merged}>{request.state} - merged</span>}
 						</div>
 					</li>
 				))}
