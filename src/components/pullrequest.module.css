@@ -1,11 +1,17 @@
 .open {
-	color: mediumspringgreen;
+	background: limegreen;
+	color: white;
+	padding: 1px 3px;
 }
 
 .closed {
-	color: firebrick;
+	background: firebrick;
+	color: white;
+	padding: 1px 3px;
 }
 
 .merged {
-	color: rebeccapurple;
+	background: rebeccapurple;
+	color: white;
+	padding: 1px 3px;
 }

@@ -11,13 +11,20 @@ class PullRequestList extends Component {
 				{this.props.pullRequests.map(request => (
 					<li key={request.id}>
 						<div>
-							<a href={request.html_url} target="_blank" rel="noopener noreferrer">{request.title}</a>
+							<a href={request.html_url} target="_blank" rel="noopener noreferrer" className="margin-right-sm">{request.title}</a>
 
-							{request.state === 'opened' && <span className={style.open}>{request.state}</span>}
+							{request.state === 'open' &&
+								<span className={request.merged === true ? style.merged : style.open}>
+									{request.state}
+								</span>
+							}
 
-							{(request.state === 'closed' && request.merged === false) && <span className={style.closed}>{request.state} - not merged</span>}
+							{(request.state === 'closed') &&
+								<span className={request.merged === true ? style.merged : style.closed}>
+									{request.state} ({request.merged === true ? 'merged' : 'not merged'})
+								</span>
+							}
 
-							{(request.state === 'closed' && request.merged === true) && <span className={style.merged}>{request.state} - merged</span>}
 						</div>
 					</li>
 				))}
