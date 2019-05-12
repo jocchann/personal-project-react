@@ -66,3 +66,11 @@
 .full-height {
 	min-height: 100vh;
 }
+
+.margin-right-sm {
+	margin-right: 0.5rem;
+}
+
+ul li {
+	margin-bottom: 5px;
+}
