@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from "react-redux";
+import { setUsername, login } from "../store/actions";
 
 class Login extends Component {
 
@@ -13,7 +15,7 @@ class Login extends Component {
 					<div>
 						<label className="display-block">Enter your GitHub username</label>
 
-						<input className="field-input" type="text" onChange={setUsername} value={username}/>
+						<input className="field-input" type="text" onChange={(event) => setUsername(event)} value={username}/>
 
 					</div>
 
@@ -22,7 +24,7 @@ class Login extends Component {
 					{(submitAttempt === true && username !== '') && <p className="text-red">Could not get the user</p>}
 
 					<div className="text-center">
-						<button onClick={login} className="button">Login</button>
+						<button onClick={() => login(username)} className="button">Login</button>
 					</div>
 				</div>
 			</div>
@@ -30,4 +32,17 @@ class Login extends Component {
 	}
 }
 
-export default Login;
+const mapStateToProps = state => ({
+	username: state.username,
+	submitAttempt: state.submitAttempt
+});
+
+const mapDispatchToProps = {
+	setUsername: setUsername,
+	login: login
+};
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(Login);

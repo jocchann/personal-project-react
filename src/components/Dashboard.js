@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
+import { connect } from "react-redux";
+import { logout } from "../store/actions";
 
 import RepoList from './RepoList';
 import PullRequestList from './PullRequestList';
 
 class Dashboard extends Component {
 	render(props) {
-		const { username, repos, pullRequests, logout} = this.props;
+		const { username, logout } = this.props;
 
 		return (
 			<div>
@@ -15,13 +17,25 @@ class Dashboard extends Component {
 					<button onClick={logout} className="button">logout</button>
 				</div>
 
-				<RepoList repos={repos}/>
+				<RepoList/>
 
-				<PullRequestList pullRequests={pullRequests}/>
+				<PullRequestList/>
 			</div>
 		);
 	}
-
 }
 
-export default Dashboard;
+
+const mapStateToProps = state => ({
+	username: state.username,
+	repos: state.repos
+});
+
+const mapDispatchToProps = {
+	logout: logout
+};
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(Dashboard);

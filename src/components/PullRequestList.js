@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
+import { connect } from "react-redux";
+
 import style from './pullrequest.module.css'
 
 class PullRequestList extends Component {
-
 	render(props) {
 		const { pullRequests } = this.props;
 
@@ -12,6 +13,7 @@ class PullRequestList extends Component {
 
 				<ul>
 				{pullRequests.map(request => (
+
 					<li key={request.id}>
 						<div>
 							<a href={request.html_url} target="_blank" rel="noopener noreferrer" className="margin-right-sm">{request.title}</a>
@@ -39,4 +41,11 @@ class PullRequestList extends Component {
 	}
 }
 
-export default PullRequestList;
+const mapStateToProps = state => ({
+	pullRequests: state.pullRequests
+});
+
+
+export default connect(
+	mapStateToProps
+)(PullRequestList);

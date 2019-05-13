@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from "react-redux";
 
 class RepoList extends Component {
 	render(props) {
@@ -22,4 +23,11 @@ class RepoList extends Component {
 	}
 }
 
-export default RepoList;
+const mapStateToProps = state => ({
+	repos: state.repos
+});
+
+
+export default connect(
+	mapStateToProps
+)(RepoList);
