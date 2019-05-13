@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
 
+import Dashboard from './components/Dashboard';
+import Login from './components/Login';
 import Loader from './components/Loader';
-import RepoList from './components/RepoList';
-import PullRequestList from './components/PullRequestList';
 
 const githubApi = `https://api.github.com/users`;
 
@@ -14,7 +14,7 @@ class App extends Component {
 
 		this.state = {
 			isLoggedIn: false,
-			user: '',
+			username: '',
 			repos: [],
 			pullRequestUrls: [],
 			pullRequests: [],
@@ -22,39 +22,32 @@ class App extends Component {
 			loginError: false,
 			submitAttempt: false
 		}
+
+		this.logout = this.logout.bind(this);
+		this.login = this.login.bind(this);
+		this.setUsername = this.setUsername.bind(this);
 	}
 
 	setUsername(val) {
 		this.setState({
-			user: val
+			username: val.target.value
 		});
 	};
 
-	updateStateWithData(data) {
-		//updates the state by recieving an object of objects based on key = state name
-		const stateName = Object.keys(data);
 
-		stateName.forEach(state => {
-			this.setState({
-				[state]: data[state]
-			});
-		});
-
-	}
-
+	//get pull request events that were opened
+	//skips closed or other events as those are not the user's pull requests they opened
 	filterPullRequests(events) {
-		//get pull request events that were opened
-		//skips closed or other events as those are not the user's pull requests they opened
 		return events.filter(event => event.type === "PullRequestEvent" && event.payload.action === "opened");
 	}
 
+	//return all forked repos
 	filterForkedRepos(repos) {
-		//return all forked repos
 		return repos.filter(repo => repo.fork);
 	}
 
+	//fetch the pull request information from the api
 	pullRequestsPromise(prs) {
-		//fetch the pull request information from the api
 		return new Promise((resolve, reject) => {
 			fetch(`${prs}`)
 			.then(res => {
@@ -64,48 +57,33 @@ class App extends Component {
 				resolve(data);
 			})
 			.catch((error) => {
-
-				// this.setState({
-				// 	loginError: true
-				// });
-
-				console.log('error: ' + error);
-
-
 				reject(error);
 			});
 		});
 	}
 
+	//fetch the list of user events
 	eventsPromise(user) {
-		//fetch the list of user events
 		return new Promise((resolve, reject) => {
 			fetch(`${githubApi}/${user}/events`)
 			.then(res => {
 				return res.ok ? res.json() : reject(res.status);
 			})
 			.then(data => {
+
 				//filter for pull requests
 				const filteredRequests = this.filterPullRequests(data);
 
-				const resData = {
-					pullRequestUrls: filteredRequests
-				}
-				resolve(resData);
+				resolve(filteredRequests);
 			})
 			.catch((error) => {
-
-				this.setState({
-					loginError: true
-				});
-
 				reject(error);
 			});
 		});
 	}
 
+	//fetch the user's repos from the api
 	reposPromise(user) {
-		//fetch the user's repos from the api
 		return new Promise((resolve, reject) => {
 			fetch(`${githubApi}/${user}/repos`)
 			.then(res => {
@@ -114,17 +92,10 @@ class App extends Component {
 			.then(data => {
 				//filter for user's forked repos
 				const filteredRepos = this.filterForkedRepos(data);
-				const resData = {
-					repos: filteredRepos
-				}
-				resolve(resData);
+
+				resolve(filteredRepos);
 			})
 			.catch((error) => {
-
-				this.setState({
-					loginError: true
-				});
-
 				reject(error);
 			});
 		});
@@ -134,17 +105,29 @@ class App extends Component {
 		//show loading state while promises are being fufilled / rejected
 		this.setState({
 			isLoading: true,
-			submitAttempt: false
+			submitAttempt: false,
+			loginError: false
 		});
 
 		//call the event and repo promises using the user inputted value and wait for
 		//both promises to complete
-		Promise.all([this.eventsPromise(this.state.user), this.reposPromise(this.state.user)])
+		Promise.all([
+			this.eventsPromise(this.state.username),
+			this.reposPromise(this.state.username)
+		])
 		.then((data) => {
+
 			//update the state with the returned data from the completed promises
-			data.forEach(d => this.updateStateWithData(d));
+			const [pullRequestEvents, forkedRepos] = data;
+
+			this.setState({
+				pullRequestUrls: pullRequestEvents,
+				repos: forkedRepos,
+			})
 		})
 		.then(() => {
+
+			//get each pull request event's pr data so the status can be determined
 			//create an array of pull request events that will call promises so .all can be called on them
 			//and complete together instead of asynchronously
 			let prPromises = (this.state.pullRequestUrls).reduce((acc, prLink) => {
@@ -169,6 +152,7 @@ class App extends Component {
 			//catch any issues from the api - if events and repos return an error,
 			//don't let the user log in and show an error message
 			this.setState({
+				loginError: true,
 				isLoggedIn: false,
 				isLoading: false,
 				submitAttempt: true
@@ -179,10 +163,10 @@ class App extends Component {
 
 
 	logout() {
-		//reset the state
+		//reset the state and clear the data
 		this.setState({
 			isLoggedIn: false,
-			user: '',
+			username: '',
 			repos: [],
 			pullRequestUrls: [],
 			pullRequests: [],
@@ -197,45 +181,27 @@ class App extends Component {
 		return (
 			<div className="container">
 			{this.state.isLoggedIn === false && this.state.isLoading === false && (
-				<div  className="text-center flex-center full-height">
-					<div>
-
-						<h1>Log in to GitHub</h1>
-
-						<div>
-							<label className="display-block">Enter your GitHub username</label>
-
-							<input className="field-input" type="text" onChange={({ target: { value } }) => this.setUsername(value)} value={this.state.user}/>
-						</div>
-
-						{(this.state.submitAttempt === true && this.state.user === '') && <p className="text-red">Please type in a username</p>}
-
-						{(this.state.submitAttempt === true && this.state.user !== '') && <p className="text-red">Could not get the user</p>}
-
-						<div className="text-center">
-							<button onClick={() => this.login(this.state.user)} className="button">Login</button>
-						</div>
-					</div>
-				</div>
+				<Login
+					username={this.state.username}
+					setUsername={this.setUsername}
+					submitAttempt={this.state.submitAttempt}
+					login={this.login}
+				/>
 			)}
 
 
 			{this.state.isLoading === true && <Loader />}
 
 
-			{this.state.isLoggedIn === true && this.state.isLoading === false && (
-				<div>
-					<h1 className="text-center">Welcome, {this.state.user}</h1>
+			{(this.state.isLoggedIn === true && this.state.isLoading === false) &&
+				<Dashboard
+					username={this.state.username}
+					repos={this.state.repos}
+					pullRequests={this.state.pullRequests}
+					logout={this.logout}
 
-					<div className="text-center">
-						<button onClick={() => this.logout()} className="button">logout</button>
-					</div>
-
-					<RepoList repos={this.state.repos} />
-
-					<PullRequestList pullRequests={this.state.pullRequests} />
-				</div>
-			)}
+				/>
+			}
 
 			</div>
 		)

@@ -2,13 +2,16 @@ import React, { Component } from 'react';
 import style from './pullrequest.module.css'
 
 class PullRequestList extends Component {
+
 	render(props) {
+		const { pullRequests } = this.props;
+
 		return (
 			<div>
 				<h2>Your recent pull requests</h2>
 
 				<ul>
-				{this.props.pullRequests.map(request => (
+				{pullRequests.map(request => (
 					<li key={request.id}>
 						<div>
 							<a href={request.html_url} target="_blank" rel="noopener noreferrer" className="margin-right-sm">{request.title}</a>
@@ -30,7 +33,7 @@ class PullRequestList extends Component {
 				))}
 				</ul>
 
-				{this.props.pullRequests.length === 0 && <p>No pull requests</p>}
+				{pullRequests.length === 0 && <p>No pull requests</p>}
 			</div>
 		);
 	}
