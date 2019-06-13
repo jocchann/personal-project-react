@@ -1,25 +1,20 @@
-import React, { Component } from 'react';
+import React from 'react';
+import RepoListItem from './RepoListItem';
 
-class RepoList extends Component {
-	render(props) {
-		const { repos } = this.props;
+const RepoList = props => {
+	const { repos } = props;
 
-		return (
-			<div>
-				<h2>Your forked repos</h2>
+	return (
+		<div>
+			<h2>Your forked repos</h2>
 
-				<ul>
-				{repos.map(repo => (
-					<li key={repo.id}>
-					<a href={repo.html_url} target="_blank" rel="noopener noreferrer">{repo.name}</a>
-					</li>
-				))}
-				</ul>
+			<ul>
+				{repos.map(repo => <RepoListItem repo={repo} />)}
+			</ul>
 
-				{repos.length === 0 && <p>No forked repos</p>}
-			</div>
-		);
-	}
+			{repos.length === 0 && <p>No forked repos</p>}
+		</div>
+	);
 }
 
 export default RepoList;

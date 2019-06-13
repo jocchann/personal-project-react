@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 
-import Dashboard from './components/Dashboard';
-import Login from './components/Login';
+import DashboardPage from './components/DashboardPage';
+import LoginPage from './components/LoginPage';
 import Loader from './components/Loader';
 
 const githubApi = `https://api.github.com/users`;
@@ -181,7 +181,7 @@ class App extends Component {
 		return (
 			<div className="container">
 			{this.state.isLoggedIn === false && this.state.isLoading === false && (
-				<Login
+				<LoginPage
 					username={this.state.username}
 					setUsername={this.setUsername}
 					submitAttempt={this.state.submitAttempt}
@@ -190,11 +190,11 @@ class App extends Component {
 			)}
 
 
-			{this.state.isLoading === true && <Loader />}
+			{(this.state.isLoggedIn === false && this.state.isLoading === true) && <Loader />}
 
 
 			{(this.state.isLoggedIn === true && this.state.isLoading === false) &&
-				<Dashboard
+				<DashboardPage
 					username={this.state.username}
 					repos={this.state.repos}
 					pullRequests={this.state.pullRequests}
